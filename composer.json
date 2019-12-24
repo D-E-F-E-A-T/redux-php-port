@@ -1,0 +1,10 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Redux\\": "src/Redux/"
+        },
+        "files": [
+            "src/Redux/helpers.php"
+        ]
+    }
+}
