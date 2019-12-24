@@ -19,6 +19,13 @@ class Store
     private $state;
 
     /**
+     * The listeners.
+     * 
+     * @var array
+     */
+    private $listeners = [];
+
+    /**
      * @param callable $reducer The root reducer.
      */
     public function __construct(callable $reducer)
@@ -34,6 +41,10 @@ class Store
     public function dispatch(array $action) 
     {
         $this->state = ($this->reducer)($this->state, $action);
+
+        foreach ($this->listeners as $listener) {
+            $listener();
+        }
     }
 
     /**
@@ -44,5 +55,25 @@ class Store
     public function getState()
     {
         return $this->state;
+    }
+
+    /**
+     * Subscribe to state changes.
+     * 
+     * @return callable Unsubscribe from store.
+     */
+    public function subscribe(callable $listener): callable 
+    {
+        $listeners =& $this->listeners;
+
+        $listeners[] = $listener;
+        
+        $id = count($this->listeners) - 1;
+
+        return function () use($listener, $id, &$listeners): callable {
+            unset($listeners[$id]);
+            
+            return $listener;
+        };
     }
 }
