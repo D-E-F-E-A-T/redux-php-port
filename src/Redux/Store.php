@@ -76,4 +76,19 @@ class Store
             return $listener;
         };
     }
+
+    /**
+     * Replace the root reducer.
+     * 
+     * @param callable $nextReducer
+     * @return callable The previous reducer.
+     */
+    public function replaceReducer(callable $nextReducer): callable
+    {
+        $previousReducer = $this->reducer;
+
+        $this->reducer = $nextReducer;
+    
+        return $previousReducer;
+    }
 }

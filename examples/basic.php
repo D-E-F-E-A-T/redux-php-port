@@ -26,3 +26,21 @@ for ($i = 1; $i <= 20; $i++) {
         'type' => 'INCREMENT'
     ]);
 }
+
+$nextReducer = $store->replaceReducer(function ($state, $action) {
+    return $state - 1;
+});
+
+for ($i = 1; $i <= 10; $i++) {
+    $store->dispatch([
+        'type' => 'INCREMENT'
+    ]);
+}
+
+$store->replaceReducer($nextReducer);
+
+for ($i = 1; $i <= 10; $i++) {
+    $store->dispatch([
+        'type' => 'INCREMENT'
+    ]);
+}
