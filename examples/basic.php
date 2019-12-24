@@ -1,46 +1,94 @@
 <?php
 
+/**
+ * Versão do PHP miníma: 7.1
+ */
+
 require __DIR__ . '/../vendor/autoload.php';
 
-use function Redux\{createStore};
+use function Redux\{
+    createStore, combineReducers, bindActionCreators, dd
+};
 
-$store = createStore(function ($state = 0, array $action) {
+function counterReducer($state, array $action)
+{
     switch ($action['type']) {
         case 'INCREMENT':
-            return $state + 1;
-
+            return $state + $action['payload']['count'];
+        
         case 'DECREMENT':
-            return $state - 1;
+            return $state - $action['payload']['count'];
 
         default:
-            return $state;
+            return $state ?? 0;
     }
-});
+}
+
+function statusReducer($state, array $action)
+{
+    switch ($action['type']) {
+        case 'UPDATE_STATUS':
+            return $action['payload']['status'];
+
+        default:
+            return $state ?? '';
+    }
+}
+
+function increment($count = 1) 
+{
+    return [
+        'type' => 'INCREMENT',
+        'payload' => [
+            'count' => $count
+        ]
+    ];
+}
+
+function decrement($count = 1) 
+{
+    return [
+        'type' => 'DECREMENT',
+        'payload' => [
+            'count' => $count
+        ]
+    ];
+}
+
+function updateStatus($status)
+{
+    return [
+        'type' => 'UPDATE_STATUS',
+        'payload' => [
+            'status' => $status
+        ]
+    ];
+}
+
+$store = createStore(
+    combineReducers([
+        'counter' => 'counterReducer',
+        'status'  => 'statusReducer'  
+    ])
+);
 
 $store->subscribe(function () use ($store) {
-    echo "[state/new] " . $store->getState() . "\n";
+    dd($store->getState());
 });
 
-for ($i = 1; $i <= 20; $i++) {
-    $store->dispatch([
-        'type' => 'INCREMENT'
-    ]);
-}
+$creators = bindActionCreators(
+    [
+        'increment',
+        'decrement',
+        'updateStatus'
+    ],
+    [$store, 'dispatch']
+);
 
-$nextReducer = $store->replaceReducer(function ($state, $action) {
-    return $state - 1;
-});
+[$increment, $decrement, $updateStatus] = $creators;
 
-for ($i = 1; $i <= 10; $i++) {
-    $store->dispatch([
-        'type' => 'INCREMENT'
-    ]);
-}
-
-$store->replaceReducer($nextReducer);
-
-for ($i = 1; $i <= 10; $i++) {
-    $store->dispatch([
-        'type' => 'INCREMENT'
-    ]);
-}
+$updateStatus(':rocket: Aprendendo Redux');
+$updateStatus(':rocket: Recriando o Redux no PHP');
+$increment(1);
+$increment(5);
+$decrement();

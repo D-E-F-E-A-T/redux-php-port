@@ -18,3 +18,56 @@ function createStore(callable $reducer): Store
 
     return $store;
 }
+
+/**
+ * Combine reducers.
+ * 
+ * @param array $reducers
+ * @return callable
+ */
+function combineReducers(array $reducers): callable 
+{
+    return function ($state, array $action) use($reducers) : array {
+        foreach ($reducers as $key => $reducer) {
+            $reducers[$key] = $reducer($state[$key], $action);        
+        }
+
+        return $reducers;
+    };
+}
+
+/**
+ * Bind action creators.
+ * 
+ * @param array $creators
+ * @param callable $dispatch
+ * @return array
+ */
+function bindActionCreators(array $creators, callable $dispatch): array 
+{
+    foreach ($creators as $key => $creator) {
+        $creators[$key] = function () use($dispatch, $creator) {
+            return $dispatch(
+                $creator(
+                    ...func_get_args()
+                )
+            );
+        };
+    }
+
+    return $creators;
+}
+
+/**
+ * Show some data for debugging.
+ * 
+ * @param mixed $data 
+ */
+function dd($data)
+{
+    echo '<pre>';
+
+    var_dump($data);
+
+    echo '</pre>';
+}
