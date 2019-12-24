@@ -57,17 +57,3 @@ function bindActionCreators(array $creators, callable $dispatch): array
 
     return $creators;
 }
-
-/**
- * Show some data for debugging.
- * 
- * @param mixed $data 
- */
-function dd($data)
-{
-    echo '<pre>';
-
-    var_dump($data);
-
-    echo '</pre>';
-}
